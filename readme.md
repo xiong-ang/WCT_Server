@@ -26,6 +26,58 @@ webct
 ### Web API Cros
 [.Net两种Cros配置方式](https://www.cnblogs.com/landeanfen/p/5177176.html)
 
-
-## Pending Prototype
 ### FileUpload by FormData
+```javascript
+//Front-end
+var form = $('form')[0]; // You need to use standard javascript object here
+var formData = new FormData(form); 
+$.ajax({
+    url: 'Your url here',
+    data: formData,
+    type: 'POST',
+    contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+    processData: false, // NEEDED, DON'T OMIT THIS
+    // ... Other options like success and etc
+}); 
+
+// OR
+
+var data = new FormData();
+jQuery.each(jQuery('#file')[0].files, function(i, file) {
+    data.append('file-'+i, file);
+}); 
+data.append('key1', 'value1');
+data.append('key2', 'value2');
+
+jQuery.ajax({
+    url: 'php/upload.php',
+    data: data,
+    cache: false,
+    contentType: false,
+    processData: false,
+    method: 'POST',
+    type: 'POST', // For jQuery < 1.9
+    success: function(data){
+        alert(data);
+    }
+});
+```
+
+```C#
+//Back-end
+public bool Post()
+{
+    string value1 = HttpContext.Current.Request["key1"];
+    string value2 = HttpContext.Current.Request["key2"];
+    HttpFileCollection files = HttpContext.Current.Request.Files;
+
+    foreach (string f in files.AllKeys)
+    {
+        HttpPostedFile file = files[f];
+        if (string.IsNullOrEmpty(file.FileName) == false)
+            file.SaveAs(HttpContext.Current.Server.MapPath("~/App_Data/") + file.FileName);
+    }
+
+    return true;
+}
+```
